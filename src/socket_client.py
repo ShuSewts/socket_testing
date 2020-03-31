@@ -24,33 +24,37 @@ class FakeClient:
         #t1.start()
 
     def send(self, data): #should be if the length of the data is less than or equal to 2 bytes send it
-        totalsent = 0
-        while totalsent < len(data):
-            sent = self.s.send(data[totalsent:])
-            if sent == 0:
-                raise RuntimeError("socket connection broken")
-            totalsent = totalsent + sent
+        if len(data) != 2:
+            print("make that message 2 bytes and try again")
+        else:
+        sent = self.s.send(data)
+        if sent == 0:
+            raise RuntimeError("socket connection broken")
         print("message sent")
 
     def receive(self):
-        return len(self.s.recv(2)) == 2
+        message = self.s.recv(2)
+        return (len(message) == 2, message)
 
     def close(self):
         self.s.close()
 
     def heartbeat(self):
+        #self.s.send(b'HI')
         while not self.kill:
-            self.send("HIGH")
-            if not self.receive():
+            self.s.send("HI")
+            if not self.receive()[0]:
                 self.kill = True
             rospy.sleep(0.5)
-            self.send("LOW")
-            if not self.receive():
+            print("made it here")
+            self.s.send("LO")
+            if not self.receive()[0]:
                 self.kill = True
             rospy.sleep(0.5)
 
 if __name__ == "__main__":
     F = FakeClient(12345)
-    F.send("afaf")
-    F.receive()
+    #F.send("afaf")
+    print(F.receive())
+    F.heartbeat()
     F.close()
