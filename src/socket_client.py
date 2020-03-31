@@ -19,7 +19,7 @@ class FakeClient:
         self.kill = False
 
         # receive data from the server
-        print self.s.recv(1024)
+        print self.s.recv(2) # this is 2 bytes
         t1 = threading.Thread(target=self.heartbeat, kwargs={})
         #t1.start()
 
@@ -33,7 +33,7 @@ class FakeClient:
         print("message sent")
 
     def receive(self):
-        return len(self.s.recv(self.buffer)) > 0
+        return len(self.s.recv(2)) == 2
 
     def close(self):
         self.s.close()
