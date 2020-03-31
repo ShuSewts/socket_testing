@@ -34,4 +34,4 @@ while True:
    c.send('Thank you for connecting')
 
    # Close the connection with the client
-   c.close()
+   #c.close()
