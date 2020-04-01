@@ -3,6 +3,7 @@
 import socket
 import rospy
 import threading
+import time
 
 class FakeClient:
     def __init__(self, port):
@@ -33,7 +34,10 @@ class FakeClient:
         print("should have sent")
 
     def receive(self):
-        message = self.s.recv(16)
+        message = None
+        begin = time.time()
+        while message == None and time.time() - begin < 1.0:
+            message = self.s.recv(16)
         print(message)
         return (len(message) == 16, message)
 
@@ -46,11 +50,14 @@ class FakeClient:
             self.counter2 = self.counter2 +1
             if counter == 20:
                 counter = 0
-                if temp[0] == self.last_plc_heartbeat[0]:
-                    print("heard nothing from the plc for a second")
+                if temp[1][0] == self.last_plc_heartbeat[0]:
+                    print("the heartbeat hasnt changed in a second")
                     self.kill = True
-            self.last_plc_heartbeat = temp
+            self.last_plc_heartbeat = temp[1]
             rospy.sleep(0.05)
+            if not temp[0]:
+                print("we waited a whole second for a message")
+                self.kill
 
     def send_status(self):
         while not self.kill:
