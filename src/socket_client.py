@@ -17,9 +17,11 @@ class FakeClient:
         self.s.connect(('127.0.0.1', self.port))
         self.buffer = 16
         self.kill = False
-
+        self.status = None
+        self.last_plc_heartbeat = None
+        self.counter = 0
         # receive data from the server
-        print self.s.recv(16) # this is 2 bytes
+        #print self.s.recv(16) # this is 2 bytes
         t1 = threading.Thread(target=self.heartbeat, kwargs={})
         #t1.start()
 
@@ -50,9 +52,16 @@ class FakeClient:
             print("and here")
             rospy.sleep(0.5)
 
-    def send_status(self, message):
-        begin=
-        while not self.kill and
+    def request_new(self, status):
+        self.status = None
+        self.status = status
+
+    def send_status(self):
+        while not self.kill:
+            self.send(self.status)
+            #something to set the status
+            rospy.sleep(0.05)
+            counter = counter +1
 
 if __name__ == "__main__":
     F = FakeClient(12345)
