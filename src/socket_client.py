@@ -20,6 +20,7 @@ class FakeClient:
         self.status = None
         self.last_plc_heartbeat = None
         self.counter = 0
+        self.plc_counter = 0 #made 2 as i dont know if theyll be close enough in time
         # receive data from the server
         #print self.s.recv(16) # this is 2 bytes
         t1 = threading.Thread(target=self.heartbeat, kwargs={})
@@ -39,29 +40,24 @@ class FakeClient:
     def close(self):
         self.s.close()
 
-    def heartbeat(self):
+    def get_plc_status(self):
         while not self.kill:
-            self.s.send("01")
-            if not self.receive()[0]:
-                self.kill = True
-            rospy.sleep(0.5)
-            print("made it here")
-            self.s.send("00")
-            if not self.receive()[0]:
-                self.kill = True
-            print("and here")
-            rospy.sleep(0.5)
-
-    def request_new(self, status):
-        self.status = None
-        self.status = status
+            temp = self.receive()
+            self.counter2 = self.counter2 +1
+            if counter == 20:
+                counter = 0
+                if temp[0] == self.last_plc_heartbeat[0]:
+                    print("heard nothing from the plc for a second")
+                    self.kill = True
+            self.last_plc_heartbeat = temp
+            rospy.sleep(0.05)
 
     def send_status(self):
         while not self.kill:
             self.send(self.status)
             #something to set the status
             rospy.sleep(0.05)
-            counter = counter +1
+            self.counter = self.counter +1
 
 if __name__ == "__main__":
     F = FakeClient(12345)
