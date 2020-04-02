@@ -17,9 +17,9 @@ class FakeClient:
         # connect to the server on local computer
         self.s.connect(('127.0.0.1', self.port))
         self.buffer = 16
-        self.kill = True
-        self.status = "NoneNOENONENOE"
-        self.last_plc_heartbeat = "NoneNOENONENOE"
+        self.kill = False
+        self.status = "NoneNONENONENONE"
+        self.last_plc_heartbeat = "NoneNONENONENONE"
         self.counter = 0
         self.plc_counter = 0 #made 2 as i dont know if theyll be close enough in time
 
