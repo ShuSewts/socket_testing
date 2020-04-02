@@ -24,13 +24,13 @@ class FakeClient:
         self.plc_counter = 0 #made 2 as i dont know if theyll be close enough in time
         # receive data from the server
         #print self.s.recv(16) # this is 2 bytes
-        t1 = threading.Thread(target=self.heartbeat, kwargs={})
+        #t1 = threading.Thread(target=self.heartbeat, kwargs={})
         #t1.start()
 
     def send(self, data): #data should be a byte array
         b = bytearray()
         b.extend(map(ord, data))
-        s.send(b)
+        self.s.send(b)
         print("should have sent")
 
     def receive(self):
@@ -60,15 +60,17 @@ class FakeClient:
                 self.kill
 
     def send_status(self):
+        self.status = "afaf"
         while not self.kill:
             self.send(self.status)
+            print("sent")
             #something to set the status
             rospy.sleep(0.05)
             self.counter = self.counter +1
 
 if __name__ == "__main__":
     F = FakeClient(12345)
-    #F.send("afaf")
+    F.send_status()
     print(F.receive())
-    F.heartbeat()
+    #F.heartbeat()
     F.close()
