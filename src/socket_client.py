@@ -70,5 +70,6 @@ if __name__ == "__main__":
     F = FakeClient(12345)
     #F.send_status()
     F.get_plc_status()
-    print(F.receive())
+    #print(F.receive())
+    #print(F.receive())
     F.close()
