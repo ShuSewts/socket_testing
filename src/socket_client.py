@@ -16,6 +16,7 @@ class FakeClient:
 
         # connect to the server on local computer
         self.s.connect(('127.0.0.1', self.port))
+        self.s.setblocking(0)
         self.buffer = 16
         self.kill = False
         self.status = "NoneNONENONENONE"
@@ -27,14 +28,18 @@ class FakeClient:
         b = bytearray()
         b.extend(map(ord, data))
         self.s.send(b)
-        print("should have sent")
+        #print("should have sent")
 
     def receive(self):
         message = None
         begin = time.time()
-        while message == None and time.time() - begin < 1.0:
-            message = self.s.recv(16)
-        print(message)
+        while message == None and (time.time() - begin < 1.0):
+            try:
+                message = self.s.recv(16)
+            except socket.error as exc:
+                return (False, "gone")
+
+        #print(message)
         return (len(message) == 16, message)
 
     def close(self):
@@ -43,6 +48,7 @@ class FakeClient:
     def get_plc_status(self):
         while not self.kill:
             temp = self.receive()
+            print(temp)
             self.plc_counter = self.plc_counter +1
             if self.plc_counter == 20:
                 self.plc_counter = 0
@@ -59,7 +65,7 @@ class FakeClient:
         self.status = "afaf"
         while not self.kill:
             self.send(self.status)
-            print("sent")
+            #print("sent")
             #something to set the status
             rospy.sleep(0.05)
             self.counter = self.counter +1
