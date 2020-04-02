@@ -30,8 +30,10 @@ while True:
    c, addr = s.accept()
    print 'Got connection from', addr
 
-   # send a thank you message to the client.
-   c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquas')
+   #FOR NO MESSAGES AFTER A WHILE
+   c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
+   #FOR UNCHANGING HEARTBEATS
+   #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
 
    # Close the connection with the client
    #c.close()
