@@ -17,15 +17,13 @@ class FakeClient:
         # connect to the server on local computer
         self.s.connect(('127.0.0.1', self.port))
         self.buffer = 16
-        self.kill = False
+        self.kill = True
         self.status = None
         self.last_plc_heartbeat = None
         self.counter = 0
         self.plc_counter = 0 #made 2 as i dont know if theyll be close enough in time
         # receive data from the server
         #print self.s.recv(16) # this is 2 bytes
-        #t1 = threading.Thread(target=self.heartbeat, kwargs={})
-        #t1.start()
 
     def send(self, data): #data should be a byte array
         b = bytearray()
@@ -47,9 +45,9 @@ class FakeClient:
     def get_plc_status(self):
         while not self.kill:
             temp = self.receive()
-            self.counter2 = self.counter2 +1
-            if counter == 20:
-                counter = 0
+            self.plc_counter = self.plc_counter +1
+            if self.plc_counter == 20:
+                self.plc_counter = 0
                 if temp[1][0] == self.last_plc_heartbeat[0]:
                     print("the heartbeat hasnt changed in a second")
                     self.kill = True
@@ -57,7 +55,7 @@ class FakeClient:
             rospy.sleep(0.05)
             if not temp[0]:
                 print("we waited a whole second for a message")
-                self.kill
+                self.kill = True
 
     def send_status(self):
         self.status = "afaf"
@@ -70,7 +68,7 @@ class FakeClient:
 
 if __name__ == "__main__":
     F = FakeClient(12345)
-    F.send_status()
+    #F.send_status()
+    F.get_plc_status()
     print(F.receive())
-    #F.heartbeat()
     F.close()
