@@ -18,12 +18,10 @@ class FakeClient:
         self.s.connect(('127.0.0.1', self.port))
         self.buffer = 16
         self.kill = True
-        self.status = None
-        self.last_plc_heartbeat = None
+        self.status = "NoneNOENONENOE"
+        self.last_plc_heartbeat = "NoneNOENONENOE"
         self.counter = 0
         self.plc_counter = 0 #made 2 as i dont know if theyll be close enough in time
-        # receive data from the server
-        #print self.s.recv(16) # this is 2 bytes
 
     def send(self, data): #data should be a byte array
         b = bytearray()
@@ -66,10 +64,19 @@ class FakeClient:
             rospy.sleep(0.05)
             self.counter = self.counter +1
 
+    def thread_links(self):
+        Thread1 = threading.Thread(target=self.send_status, kwargs={})
+        Thread2 = threading.Thread(target=self.get_plc_status, kwargs={})
+        Thread1.start()
+        Thread2.start()
+        Thread1.join()
+        Thread2.join()
+
 if __name__ == "__main__":
     F = FakeClient(12345)
     #F.send_status()
-    F.get_plc_status()
+    #F.get_plc_status()
+    F.thread_links()
     #print(F.receive())
     #print(F.receive())
     F.close()
