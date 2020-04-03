@@ -5,6 +5,10 @@ import rospy
 import threading
 import time
 
+
+##ways to make this shit faster
+##send longer MESSAGES
+##decrease the amount of overhead, if possible
 class FakeClient:
     def __init__(self, port):
         rospy.init_node("fake_client", anonymous=True)
