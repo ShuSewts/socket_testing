@@ -5,7 +5,6 @@ import rospy
 import threading
 import time
 
-
 ##ways to make this shit faster
 ##send longer MESSAGES
 ##decrease the amount of overhead, if possible
@@ -39,7 +38,7 @@ class FakeClient:
         begin = time.time()
         while message == None and (time.time() - begin < 1.0):
             try:
-                message = self.s.recv(16)
+                message = self.s.recv(32)
             except socket.error as exc:
                 return (False, "gone")
 
@@ -48,6 +47,12 @@ class FakeClient:
 
     def close(self):
         self.s.close()
+
+    def process_hex(self, message):
+        return bin(int(message, 16))[2:].zfill(8)
+
+    def process_binary(self, message):
+        return hex(int(message, 2))
 
     def get_plc_status(self):
         while not self.kill:
@@ -73,6 +78,9 @@ class FakeClient:
             #something to set the status
             rospy.sleep(0.05)
             self.counter = self.counter +1
+
+    def scenario(self):
+        print("This is a simulation (in messages) of a standard scenario.")
 
     def thread_links(self):
         Thread1 = threading.Thread(target=self.send_status, kwargs={})
