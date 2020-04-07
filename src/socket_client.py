@@ -104,7 +104,9 @@ class FakeClient:
         while(time.time()- begin < 1):
             pass
         self.status = self.status[0] + "0100000000000000000000000000000"
-        
+
+    def killable_scenarios(self):
+        print("we only have the heartbeat right now")
 
     def thread_links(self):
         Thread1 = threading.Thread(target=self.send_status, kwargs={})
