@@ -22,8 +22,8 @@ class FakeClient:
         self.s.setblocking(0)
         self.buffer = 16
         self.kill = False
-        self.status = "NoneNONENONENONE"
-        self.last_plc_heartbeat = "NoneNONENONENONE"
+        self.status = "NoneNONENONENONENoneNONENONENONE"
+        self.last_plc_heartbeat = "NoneNONENONENONENoneNONENONENONE"
         self.counter = 0
         self.plc_counter = 0 #made 2 as i dont know if theyll be close enough in time
 
@@ -46,6 +46,8 @@ class FakeClient:
         remainder = ''
         for thing in message:
             remainder = bin(thing)[2:].zfill(8)
+
+        self.last_plc_heartbeat = remainder
         return (len(message) == 4, remainder)
 
     def close(self):
@@ -74,16 +76,20 @@ class FakeClient:
                 self.kill = True
 
     def send_status(self):
-        self.status = "afaf"
         while not self.kill:
-            self.send(self.status)
-            #print("sent")
-            #something to set the status
+            self.send(self.status) #long binary string
             rospy.sleep(0.05)
             self.counter = self.counter +1
 
     def scenario(self):
         print("This is a simulation (in messages) of a standard scenario.")
+        print("begin by waiting for a plc signal..")
+        message = None
+        while message == None and self.last_plc_heartbeat[16] != "1":
+            message = self.receive()
+        print("plc is alive, grabbing towel. This will take 10 seconds..")
+        begin = time.time()
+        while(time.time()- begin < 10)
 
     def thread_links(self):
         Thread1 = threading.Thread(target=self.send_status, kwargs={})
