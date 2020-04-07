@@ -1,7 +1,10 @@
 
 # first of all import the socket library
 import socket#
+import sys
+#sys.path.append('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import rospy
+#sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 
 rospy.init_node("fake_plc", anonymous=True)
 
@@ -31,13 +34,14 @@ while True:
 
    # Establish connection with client.
    c, addr = s.accept()
-   print 'Got connection from', addr
+   print('Got connection from', addr)
 
 
    #FOR NO MESSAGES AFTER A WHILE
    #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
    #FOR UNCHANGING HEARTBEATS
-   c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
-   c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
+   #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
+   #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
+   c.send()
    # Close the connection with the client
    #c.close()

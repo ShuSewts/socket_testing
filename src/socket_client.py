@@ -22,8 +22,8 @@ class FakeClient:
         self.s.setblocking(0)
         self.buffer = 16
         self.kill = False
-        self.status = "NoneNONENONENONENoneNONENONENONE"
-        self.last_plc_heartbeat = "NoneNONENONENONENoneNONENONENONE"
+        self.status = "0000000000000000000000000000000"
+        self.last_plc_heartbeat = "0000000000000000000000000000000"
         self.counter = 0
         self.plc_counter = 0 #made 2 as i dont know if theyll be close enough in time
 
@@ -79,7 +79,7 @@ class FakeClient:
             self.send(self.status) #long binary string
             rospy.sleep(0.05)
             self.counter = self.counter +1
-            if self.counter = 10:
+            if self.counter == 10:
                 if self.status[0] == "0":
                     self.status[0] = "1"
                 else:
