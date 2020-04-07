@@ -27,8 +27,9 @@ class FakeClient:
         self.counter = 0
         self.plc_counter = 0 #made 2 as i dont know if theyll be close enough in time
 
-    def send(self, data): #data should be a byte array
-        b = bytearray()
+    def send(self, data): #give a binary message
+        data = self.process_binary(data)
+        b = bytearray.fromhex(data[2:])
         b.extend(map(ord, data))
         self.s.send(b)
         #print("should have sent")
