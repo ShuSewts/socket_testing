@@ -30,7 +30,6 @@ class FakeClient:
     def send(self, data): #give a binary message
         data = self.process_binary(data)
         b = bytearray.fromhex(data[2:])
-        b.extend(map(ord, data))
         self.s.send(b)
         #print("should have sent")
 
@@ -80,6 +79,11 @@ class FakeClient:
             self.send(self.status) #long binary string
             rospy.sleep(0.05)
             self.counter = self.counter +1
+            if self.counter = 10:
+                if self.status[0] == "0":
+                    self.status[0] = "1"
+                else:
+                    self.status[0] = "0"
 
     def scenario(self):
         print("This is a simulation (in messages) of a standard scenario.")
@@ -89,7 +93,10 @@ class FakeClient:
             message = self.receive()
         print("plc is alive, grabbing towel. This will take 10 seconds..")
         begin = time.time()
-        while(time.time()- begin < 10)
+        while(time.time()- begin < 10):
+            self.status = "10100000000000000100000000000000"
+        print("towel ready for plc")
+        self.status = "10100000000000000100000000000000"
 
     def thread_links(self):
         Thread1 = threading.Thread(target=self.send_status, kwargs={})
