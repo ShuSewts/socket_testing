@@ -39,12 +39,14 @@ class FakeClient:
         begin = time.time()
         while message == None and (time.time() - begin < 1.0):
             try:
-                message = self.s.recv(32)
+                message = self.s.recv(4)
             except socket.error as exc:
                 return (False, "gone")
 
-        #print(message)
-        return (len(message) == 16, message)
+        remainder = ''
+        for thing in message:
+            remainder = bin(thing)[2:].zfill(8)
+        return (len(message) == 4, remainder)
 
     def close(self):
         self.s.close()
