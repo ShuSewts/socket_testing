@@ -93,10 +93,18 @@ class FakeClient:
             message = self.receive()
         print("plc is alive, grabbing towel. This will take 10 seconds..")
         begin = time.time()
-        while(time.time()- begin < 10):
-            self.status = "10100000000000000100000000000000"
+        while(time.time()- begin < 10) and self.last_plc_heartbeat[17] == "1":
+            self.status = self.status[0] + "0100000000000000100000000000000"
         print("towel ready for plc")
-        self.status = "10100000000000000100000000000000"
+        self.status = self.status[0] + "0100000000000001000000000000000"
+        while self.last_plc_heartbeat[18] != 1:
+            pass
+        print("tcp will now move out of the target position. This will take a second...")
+        begin = time.time()
+        while(time.time()- begin < 1):
+            pass
+        self.status = self.status[0] + "0100000000000000000000000000000"
+        
 
     def thread_links(self):
         Thread1 = threading.Thread(target=self.send_status, kwargs={})
