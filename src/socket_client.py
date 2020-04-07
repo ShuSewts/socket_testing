@@ -104,6 +104,11 @@ class FakeClient:
         while(time.time()- begin < 1):
             pass
         self.status = self.status[0] + "0100000000000000000000000000000"
+        print("axis do your thing")
+        begin = time.time()
+        while not self.kill and (time.time() - begin < 10):
+            pass
+        self.kill = True
 
     def killable_scenarios(self):
         print("we only have the heartbeat right now")
@@ -111,6 +116,7 @@ class FakeClient:
     def thread_links(self):
         Thread1 = threading.Thread(target=self.send_status, kwargs={})
         Thread2 = threading.Thread(target=self.get_plc_status, kwargs={})
+        Thread3 = threading.Thread(target=self.scenario, kwargs = {})
         Thread1.start()
         Thread2.start()
         Thread1.join()
