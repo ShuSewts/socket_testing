@@ -42,6 +42,7 @@ while True:
    #FOR UNCHANGING HEARTBEATS
    #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
    #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofbla ckquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
-   c.send()
+   c.send("11010110000000001100000000000000")
+   #11010110 00000000 11000000 00000000
    # Close the connection with the client
    #c.close()
