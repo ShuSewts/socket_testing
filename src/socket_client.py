@@ -84,6 +84,7 @@ class FakeClient:
                     self.status[0] = "1"
                 else:
                     self.status[0] = "0"
+                self.counter = 0
 
     def scenario(self, message):
         while message is None and self.last_plc_heartbeat[16] != "1":

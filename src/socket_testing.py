@@ -35,14 +35,27 @@ while True:
    # Establish connection with client.
    c, addr = s.accept()
    print('Got connection from', addr)
-
+   counter = 0
+   message = "11010110000000001100000000000000"
 
    #FOR NO MESSAGES AFTER A WHILE
    #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
    #FOR UNCHANGING HEARTBEATS
    #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
    #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofbla ckquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
-   c.send("11010110000000001100000000000000")
+   while True:
+       message = message[0] + "1010110000000001100000000000000"
+       conf = bin(int(message, 16))[2:].zfill(8)
+       last = bytearray.fromhex(conf[2:])
+       c.send(last)
+       time.sleep(0.05)
+       counter = counter +1
+       if counter == 10:
+           if message[0] == "1":
+               message[0] = "0"
+           else:
+               message[0] = "1"
+           counter = 0
    #11010110 00000000 11000000 00000000
    # Close the connection with the client
    #c.close()
