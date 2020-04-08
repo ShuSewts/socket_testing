@@ -86,9 +86,6 @@ class FakeClient:
                     self.status[0] = "0"
 
     def scenario(self):
-        print("This is a simulation (in messages) of a standard scenario.")
-        print("begin by waiting for a plc signal..")
-        message = None
         while message == None and self.last_plc_heartbeat[16] != "1":
             message = self.receive()
         print("plc is alive, grabbing towel. This will take 10 seconds..")
@@ -114,6 +111,9 @@ class FakeClient:
         print("we only have the heartbeat right now")
 
     def thread_links(self):
+        print("This is a simulation (in messages) of a standard scenario.")
+        print("begin by waiting for a plc signal..")
+        message = None
         Thread1 = threading.Thread(target=self.send_status, kwargs={})
         Thread2 = threading.Thread(target=self.get_plc_status, kwargs={})
         Thread3 = threading.Thread(target=self.scenario, kwargs = {})

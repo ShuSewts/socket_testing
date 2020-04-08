@@ -41,7 +41,7 @@ while True:
    #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
    #FOR UNCHANGING HEARTBEATS
    #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
-   #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
+   #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofbla ckquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
    c.send()
    # Close the connection with the client
    #c.close()
