@@ -36,7 +36,7 @@ class FakeClient:
     def receive(self):
         message = None
         begin = time.time()
-        while message == None and (time.time() - begin < 1.0):
+        while message is None and (time.time() - begin < 1.0):
             try:
                 message = self.s.recv(4)
             except socket.error as exc:
@@ -85,8 +85,8 @@ class FakeClient:
                 else:
                     self.status[0] = "0"
 
-    def scenario(self):
-        while message == None and self.last_plc_heartbeat[16] != "1":
+    def scenario(self, message):
+        while message is None and self.last_plc_heartbeat[16] != "1":
             message = self.receive()
         print("plc is alive, grabbing towel. This will take 10 seconds..")
         begin = time.time()
@@ -98,7 +98,7 @@ class FakeClient:
             pass
         print("tcp will now move out of the target position. This will take a second...")
         begin = time.time()
-        while(time.time()- begin < 1):
+        while time.time() - begin < 1:
             pass
         self.status = self.status[0] + "0100000000000000000000000000000"
         print("axis do your thing")
@@ -113,14 +113,15 @@ class FakeClient:
     def thread_links(self):
         print("This is a simulation (in messages) of a standard scenario.")
         print("begin by waiting for a plc signal..")
-        message = None
         Thread1 = threading.Thread(target=self.send_status, kwargs={})
         Thread2 = threading.Thread(target=self.get_plc_status, kwargs={})
-        Thread3 = threading.Thread(target=self.scenario, kwargs = {})
+        Thread3 = threading.Thread(target=self.scenario, kwargs={'message': None})
         Thread1.start()
         Thread2.start()
+        Thread3.start()
         Thread1.join()
         Thread2.join()
+        Thread3.join()
 
 if __name__ == "__main__":
     F = FakeClient(12345)
