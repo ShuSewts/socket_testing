@@ -22,8 +22,8 @@ class FakeClient:
         self.s.setblocking(0)
         self.buffer = 16
         self.kill = False
-        self.status = "00000000000000000000000000000000"
-        self.last_plc_heartbeat = "00000000000000000000000000000000"
+        self.status = "10100000000000000100000000000000"
+        self.last_plc_heartbeat = "11010110000000001100000000000000"
         self.counter = 0
         self.plc_counter = 0 #made 2 as i dont know if theyll be close enough in time
 
@@ -54,7 +54,7 @@ class FakeClient:
 
         remainder = ''
         for thing in message:
-            remainder = remainder + process_hex(thing)
+            remainder = remainder + self.process_hex(thing)
             print(remainder)
 
         self.last_plc_heartbeat = remainder
@@ -87,9 +87,9 @@ class FakeClient:
                 self.send(self.status) #long binary string
                 time.sleep(0.05)
             if self.status[0] == "0":
-                self.status[0] = "1"
+                self.status = "1" + self.status[1:]
             else:
-                self.status[0] = "0"
+                self.status = "0" + self.status[1:]
 
     def scenario(self, message):
         print("waiting for run signal from plc..")
