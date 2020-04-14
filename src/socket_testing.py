@@ -32,12 +32,15 @@ print("socket is listening")
 # an error occurs
 
    # Establish connection with client.
+counter = 0
+message = "11010110000000001100000000000000"
 addr = None
 while addr == None:
    c, addr = s.accept()
    print('Got connection from', addr)
-counter = 0
-message = "11010110000000001100000000000000"
+conf = bin(int(message, 16))[2:].zfill(8)
+last = bytearray.fromhex(conf[2:])
+c.send(message)
 
 #FOR NO MESSAGES AFTER A WHILE
 #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')

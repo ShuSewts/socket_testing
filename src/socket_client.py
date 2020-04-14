@@ -22,17 +22,27 @@ class FakeClient:
         self.s.setblocking(0)
         self.buffer = 16
         self.kill = False
-        self.status = "0000000000000000000000000000000"
-        self.last_plc_heartbeat = "0000000000000000000000000000000"
+        self.status = "00000000000000000000000000000000"
+        self.last_plc_heartbeat = "00000000000000000000000000000000"
         self.counter = 0
         self.plc_counter = 0 #made 2 as i dont know if theyll be close enough in time
 
+    #hex to binary
+    def process_hex(self, message):
+        return bin(int(message, 16))[2:].zfill(8)
+
+    #binary to hex
+    def process_binary(self, message):
+        return hex(int(message, 2))
+
+    #takes a binary message and sends a hex byte array
     def send(self, data): #give a binary message
         data = self.process_binary(data)
         b = bytearray.fromhex(data[2:])
         self.s.send(b)
         #print("should have sent")
 
+    #receives a hex byte array converts to a binary string
     def receive(self):
         message = None
         begin = time.time()
@@ -44,7 +54,7 @@ class FakeClient:
 
         remainder = ''
         for thing in message:
-            remainder = bin(thing)[2:].zfill(8)
+            remainder = remainder + process_hex(thing)
 
         self.last_plc_heartbeat = remainder
         print(self.last_plc_heartbeat)
@@ -52,12 +62,6 @@ class FakeClient:
 
     def close(self):
         self.s.close()
-
-    def process_hex(self, message):
-        return bin(int(message, 16))[2:].zfill(8)
-
-    def process_binary(self, message):
-        return hex(int(message, 2))
 
     def get_plc_status(self):
         while not self.kill:
@@ -77,8 +81,8 @@ class FakeClient:
 
     def send_status(self):
         while not self.kill:
-            time = time.time()
-            while time.time() - time < 0.495:
+            time1 = time.time()
+            while time.time() - time1 < 0.495:
                 self.send(self.status) #long binary string
                 time.sleep(0.05)
             if self.status[0] == "0":
@@ -113,6 +117,7 @@ class FakeClient:
         print("we only have the heartbeat right now")
 
     def thread_links(self):
+        time.sleep(1)
         print("This is a simulation (in messages) of a standard scenario.")
         print("begin by waiting for a plc signal..")
         Thread1 = threading.Thread(target=self.send_status, kwargs={})
