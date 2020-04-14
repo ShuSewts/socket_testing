@@ -27,6 +27,7 @@ class FakeClient:
         self.last_plc_heartbeat = "11010110000000001100000000000000"
         self.plc_heartbeat_counter = self.last_plc_heartbeat[0] #made 2 as i dont know if theyll be close enough in time
         self.striker = False
+        self.ready = False
 
     #hex to binary
     def process_hex(self, message):
@@ -44,7 +45,10 @@ class FakeClient:
     def send(self, data): #give a binary message
         data = self.process_binary(data)
         b = bytearray.fromhex(data[2:])
-        self.s.send(b)
+        try:
+            self.s.send(b)
+        except socket.error as exc:
+            pass
 
     #receives a hex byte array converts to a binary string
     def receive(self):
@@ -55,12 +59,17 @@ class FakeClient:
                 message = self.s.recv(4)
             except socket.error as exc:
                 message = None
-        remainder = self.process_hex(binascii.hexlify(message)).zfill(32)
+        try:
+            remainder = self.process_hex(binascii.hexlify(message)).zfill(32)
+        except:
+            remainder = "0"
+            message = "0"
         #print(remainder)
         self.last_plc_heartbeat = remainder
         return (len(message) == 4, remainder)
 
     def close(self):
+        print("closing connection")
         self.s.close()
 
     #gets plc status, kills everything if the heartbeat doesnt change
@@ -91,30 +100,27 @@ class FakeClient:
 
     def scenario(self, message):
         print("Step 1: waiting for run signal from plc..")
-        print(self.kill)
         while message is None and self.last_plc_heartbeat[16] != "1" and not self.kill:
             message = self.receive()
         print("Step 2: plc is alive, robot is grabbing the towel. This will take 10 seconds..")
-        print(self.kill)
         begin = time.time()
         while(time.time()- begin < 10) and self.last_plc_heartbeat[17] == "1" and not self.kill:
             self.status = self.status[0] + "0100000000000000100000000000000"
         print("Step 3: towel ready for plc")
-        print(self.kill)
         self.status = self.status[0] + "0100000000000001000000000000000"
-        while self.last_plc_heartbeat[18] != 1 and not self.kill:
+        while self.last_plc_heartbeat[18] != "1" and not self.kill:
             pass
+            #print(self.last_plc_heartbeat[18])
         print("Step 4: tcp will now move out of the target position. This will take a second...")
-        print(self.kill)
         begin = time.time()
         while time.time() - begin < 1 and not self.kill:
             pass
         self.status = self.status[0] + "0100000000000000000000000000000"
         print("Step 5: axis handles the towel")
-        print(self.kill)
-        begin = time.time()
-        while not self.kill and (time.time() - begin < 10) and not self.kill:
-            pass
+        time.sleep(5)
+        #begin = time.time()
+        #while not self.kill and (time.time() - begin < 10):
+        #    pass
         self.kill = True
         self.close()
 
@@ -142,4 +148,4 @@ if __name__ == "__main__":
     F.thread_links()
     #print(F.receive())
     #print(F.receive())
-    F.close()
+    #F.close()

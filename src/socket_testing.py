@@ -49,18 +49,34 @@ c.send(last)
 #FOR UNCHANGING HEARTBEATS
 #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
 #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofbla ckquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
-while True:
+#while True:
    #message = message[0] + "1010110000000001100000000000000"
+start = time.time()
+while time.time() - start < 12:
    begin = time.time()
    while time.time() - begin < 0.44:
        conf = hex(int(message, 2))
        last = bytearray.fromhex(conf[2:])
        c.send(last)
-       print(binascii.hexlify(last))
+       #print(binascii.hexlify(last))
        time.sleep(0.05)
    if message[0] == "1":
        message = "0" + message[1:]
    else:
+       message = "1" + message[1:]
+
+message = message[0:18] + "1" +message[19:]
+print(message[18])
+while True:
+    begin = time.time()
+    while time.time() - begin < 0.44:
+       conf = hex(int(message, 2))
+       last = bytearray.fromhex(conf[2:])
+       c.send(last)
+       time.sleep(0.05)
+    if message[0] == "1":
+       message = "0" + message[1:]
+    else:
        message = "1" + message[1:]
 #11010110 00000000 11000000 00000000
 # Close the connection with the client
