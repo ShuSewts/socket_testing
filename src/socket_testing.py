@@ -38,9 +38,9 @@ addr = None
 while addr == None:
    c, addr = s.accept()
    print('Got connection from', addr)
-conf = bin(int(message, 16))[2:].zfill(8)
+conf = hex(int(message, 2))
 last = bytearray.fromhex(conf[2:])
-c.send(message)
+c.send(last)
 
 #FOR NO MESSAGES AFTER A WHILE
 #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
@@ -49,7 +49,7 @@ c.send(message)
 #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofbla ckquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
 while True:
    message = message[0] + "1010110000000001100000000000000"
-   conf = bin(int(message, 16))[2:].zfill(8)
+   conf = hex(int(message, 2))
    last = bytearray.fromhex(conf[2:])
    c.send(last)
    time.sleep(0.05)

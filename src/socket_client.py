@@ -55,6 +55,7 @@ class FakeClient:
         remainder = ''
         for thing in message:
             remainder = remainder + process_hex(thing)
+            print(remainder)
 
         self.last_plc_heartbeat = remainder
         print(self.last_plc_heartbeat)
@@ -112,6 +113,7 @@ class FakeClient:
         while not self.kill and (time.time() - begin < 10):
             pass
         self.kill = True
+        sel.close()
 
     def killable_scenarios(self):
         print("we only have the heartbeat right now")
