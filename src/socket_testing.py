@@ -50,17 +50,16 @@ c.send(last)
 #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofbla ckquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
 while True:
    message = message[0] + "1010110000000001100000000000000"
-   conf = hex(int(message, 2))
-   last = bytearray.fromhex(conf[2:])
-   c.send(last)
-   time.sleep(0.05)
-   counter = counter +1
-   if counter == 10:
-       if message[0] == "1":
-           message = "0" + message[1:]
-       else:
-           message = "1" + message[1:]
-       counter = 0
+   begin = time.time()
+   while time.time() - begin < 0.44:
+       conf = hex(int(message, 2))
+       last = bytearray.fromhex(conf[2:])
+       c.send(last)
+       time.sleep(0.05)
+   if message[0] == "1":
+       message = "0" + message[1:]
+   else:
+       message = "1" + message[1:]
 #11010110 00000000 11000000 00000000
 # Close the connection with the client
 #c.close()

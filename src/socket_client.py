@@ -35,6 +35,7 @@ class FakeClient:
     def process_binary(self, message):
         return hex(int(message, 2))
 
+    #int to binary
     def process_int(self, message):
         return "{0:b}".format(37).zfill(8)
 
@@ -69,15 +70,15 @@ class FakeClient:
     def close(self):
         self.s.close()
 
+    #gets plc status, kills everything if the heartbeat doesnt change
     def get_plc_status(self):
         while not self.kill:
             temp = self.receive()
-            #print(temp)
             self.plc_counter = self.plc_counter +1
-            if self.plc_counter == 20:
+            if self.plc_counter == 10:
                 self.plc_counter = 0
                 if temp[1][0] == self.last_plc_heartbeat[0]:
-                    print("the heartbeat hasnt changed in a second")
+                    print("the heartbeat hasnt changed in half a second")
                     self.kill = True
             self.last_plc_heartbeat = temp[1]
             time.sleep(0.05)
@@ -85,10 +86,11 @@ class FakeClient:
                 print("we waited a whole second for a message")
                 self.kill = True
 
+    #sends status to plc, changes heartbeat of gaming machine every half second
     def send_status(self):
         while not self.kill:
             time1 = time.time()
-            while time.time() - time1 < 0.495:
+            while time.time() - time1 < 0.44:
                 self.send(self.status) #long binary string
                 time.sleep(0.05)
             if self.status[0] == "0":
@@ -97,28 +99,28 @@ class FakeClient:
                 self.status = "0" + self.status[1:]
 
     def scenario(self, message):
-        print("waiting for run signal from plc..")
-        while message is None and self.last_plc_heartbeat[16] != "1":
+        print("Step 1: waiting for run signal from plc..")
+        while message is None and self.last_plc_heartbeat[16] != "1" and not self.kill:
             message = self.receive()
-        print("plc is alive, robot is grabbing the towel. This will take 10 seconds..")
+        print("Step 2: plc is alive, robot is grabbing the towel. This will take 10 seconds..")
         begin = time.time()
-        while(time.time()- begin < 10) and self.last_plc_heartbeat[17] == "1":
+        while(time.time()- begin < 10) and self.last_plc_heartbeat[17] == "1" and not self.kill:
             self.status = self.status[0] + "0100000000000000100000000000000"
-        print("towel ready for plc")
+        print("Step 3: towel ready for plc")
         self.status = self.status[0] + "0100000000000001000000000000000"
-        while self.last_plc_heartbeat[18] != 1:
+        while self.last_plc_heartbeat[18] != 1 and not self.kill:
             pass
-        print("tcp will now move out of the target position. This will take a second...")
+        print("Step 4: tcp will now move out of the target position. This will take a second...")
         begin = time.time()
-        while time.time() - begin < 1:
+        while time.time() - begin < 1 and not self.kill:
             pass
         self.status = self.status[0] + "0100000000000000000000000000000"
-        print("axis do your thing")
+        print("Step 5: axis handles the towel")
         begin = time.time()
-        while not self.kill and (time.time() - begin < 10):
+        while not self.kill and (time.time() - begin < 10) and not self.kill:
             pass
         self.kill = True
-        sel.close()
+        self.close()
 
     def killable_scenarios(self):
         print("we only have the heartbeat right now")
