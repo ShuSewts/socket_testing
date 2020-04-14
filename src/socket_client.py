@@ -35,6 +35,9 @@ class FakeClient:
     def process_binary(self, message):
         return hex(int(message, 2))
 
+    def process_int(self, message):
+        return "{0:b}".format(37).zfill(8)
+
     #takes a binary message and sends a hex byte array
     def send(self, data): #give a binary message
         data = self.process_binary(data)
@@ -53,12 +56,14 @@ class FakeClient:
                 return (False, "gone")
 
         remainder = ''
+        #print("00000000000000000000000000000000")
+        #print(message)
         for thing in message:
-            remainder = remainder + self.process_hex(thing)
-            print(remainder)
+            remainder = remainder + self.process_int(thing)
+            #print(remainder)
 
         self.last_plc_heartbeat = remainder
-        print(self.last_plc_heartbeat)
+        #print(self.last_plc_heartbeat)
         return (len(message) == 4, remainder)
 
     def close(self):
@@ -67,7 +72,7 @@ class FakeClient:
     def get_plc_status(self):
         while not self.kill:
             temp = self.receive()
-            print(temp)
+            #print(temp)
             self.plc_counter = self.plc_counter +1
             if self.plc_counter == 20:
                 self.plc_counter = 0
