@@ -53,8 +53,9 @@ class FakeClient:
             try:
                 message = self.s.recv(4)
             except socket.error as exc:
-                return (False, "gone")
-
+                message = None
+                #print("afafa")
+                #return (False, "gone")
         remainder = ''
         #print("00000000000000000000000000000000")
         #print(message)
@@ -63,6 +64,7 @@ class FakeClient:
             #print(remainder)
 
         self.last_plc_heartbeat = remainder
+        print(remainder)
         #print(self.last_plc_heartbeat)
         return (len(message) == 4, remainder)
 
@@ -75,8 +77,9 @@ class FakeClient:
             begin = time.time()
             while time.time() - begin < 0.94:
                 temp = self.receive()
+                #print(temp)
             if temp[1][0] == self.plc_heartbeat_counter:
-                print("the heartbeat hasnt changed in half a second")
+                print("the heartbeat hasnt changed in a second")
                 self.kill = True
             else:
                 self.plc_heartbeat_counter = temp[1][0]

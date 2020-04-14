@@ -49,12 +49,13 @@ c.send(last)
 #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
 #c.send('sphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofbla ckquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackquasphynxofblackqua')
 while True:
-   message = message[0] + "1010110000000001100000000000000"
+   #message = message[0] + "1010110000000001100000000000000"
    begin = time.time()
    while time.time() - begin < 0.44:
        conf = hex(int(message, 2))
        last = bytearray.fromhex(conf[2:])
        c.send(last)
+       print(len(last))
        time.sleep(0.05)
    if message[0] == "1":
        message = "0" + message[1:]
