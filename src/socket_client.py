@@ -4,6 +4,7 @@ import socket
 #import rospy
 import threading
 import time
+import binascii
 
 ##ways to make this shit faster
 ##send longer MESSAGES
@@ -25,6 +26,7 @@ class FakeClient:
         self.status = "10100000000000000100000000000000"
         self.last_plc_heartbeat = "11010110000000001100000000000000"
         self.plc_heartbeat_counter = self.last_plc_heartbeat[0] #made 2 as i dont know if theyll be close enough in time
+        self.striker = False
 
     #hex to binary
     def process_hex(self, message):
@@ -43,7 +45,6 @@ class FakeClient:
         data = self.process_binary(data)
         b = bytearray.fromhex(data[2:])
         self.s.send(b)
-        #print("should have sent")
 
     #receives a hex byte array converts to a binary string
     def receive(self):
@@ -54,18 +55,9 @@ class FakeClient:
                 message = self.s.recv(4)
             except socket.error as exc:
                 message = None
-                #print("afafa")
-                #return (False, "gone")
-        remainder = ''
-        #print("00000000000000000000000000000000")
-        #print(message)
-        for thing in message:
-            remainder = remainder + self.process_int(thing)
-            #print(remainder)
-
+        remainder = self.process_hex(binascii.hexlify(message)).zfill(32)
+        #print(remainder)
         self.last_plc_heartbeat = remainder
-        print(remainder)
-        #print(self.last_plc_heartbeat)
         return (len(message) == 4, remainder)
 
     def close(self):
@@ -75,27 +67,15 @@ class FakeClient:
     def get_plc_status(self):
         while not self.kill:
             begin = time.time()
-            while time.time() - begin < 0.94:
+            while time.time() - begin < 0.44:
                 temp = self.receive()
-                #print(temp)
             if temp[1][0] == self.plc_heartbeat_counter:
-                print("the heartbeat hasnt changed in a second")
-                self.kill = True
+                print("the heartbeat hasnt changed in a half a second")
+                self.striker = True
             else:
                 self.plc_heartbeat_counter = temp[1][0]
-            '''
-            self.plc_counter = self.plc_counter +1
-            if self.plc_counter == 10:
-                self.plc_counter = 0
-                if temp[1][0] == self.last_plc_heartbeat[0]:
-                    print("the heartbeat hasnt changed in half a second")
-                    self.kill = True
-            self.last_plc_heartbeat = temp[1]
-            time.sleep(0.05)
-            if not temp[0]:
-                print("we waited a whole second for a message")
+            if self.striker:
                 self.kill = True
-            '''
 
     #sends status to plc, changes heartbeat of gaming machine every half second
     def send_status(self):
