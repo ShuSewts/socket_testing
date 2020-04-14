@@ -4,6 +4,7 @@ import socket#
 import sys
 #sys.path.append('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import rospy
+import time
 #sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 
 rospy.init_node("fake_plc", anonymous=True)
@@ -56,9 +57,9 @@ while True:
    counter = counter +1
    if counter == 10:
        if message[0] == "1":
-           message[0] = "0"
+           message = "0" + message[1:]
        else:
-           message[0] = "1"
+           message = "1" + message[1:]
        counter = 0
 #11010110 00000000 11000000 00000000
 # Close the connection with the client
