@@ -47,6 +47,7 @@ class FakeClient:
             remainder = bin(thing)[2:].zfill(8)
 
         self.last_plc_heartbeat = remainder
+        print(self.last_plc_heartbeat)
         return (len(message) == 4, remainder)
 
     def close(self):
