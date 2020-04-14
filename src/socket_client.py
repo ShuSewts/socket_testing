@@ -80,7 +80,10 @@ class FakeClient:
             while time.time() - time < 0.495:
                 self.send(self.status) #long binary string
                 time.sleep(0.05)
-            #change the sleeps
+            if self.status[0] == "0":
+                self.status[0] = "1"
+            else:
+                self.status[0] = "0"
 
     def scenario(self, message):
         print("waiting for run signal from plc..")
