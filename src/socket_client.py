@@ -1,7 +1,7 @@
 
 # Import socket module
 import socket
-import rospy
+#import rospy
 import threading
 import time
 
@@ -10,7 +10,7 @@ import time
 ##decrease the amount of overhead, if possible
 class FakeClient:
     def __init__(self, port):
-        rospy.init_node("fake_client", anonymous=True)
+        #rospy.init_node("fake_client", anonymous=True)
         # Create a socket object
         self.s = socket.socket()
 
@@ -69,27 +69,24 @@ class FakeClient:
                     print("the heartbeat hasnt changed in a second")
                     self.kill = True
             self.last_plc_heartbeat = temp[1]
-            rospy.sleep(0.05)
+            time.sleep(0.05)
             if not temp[0]:
                 print("we waited a whole second for a message")
                 self.kill = True
 
     def send_status(self):
         while not self.kill:
-            self.send(self.status) #long binary string
-            rospy.sleep(0.05)
-            self.counter = self.counter +1
-            if self.counter == 10:
-                if self.status[0] == "0":
-                    self.status[0] = "1"
-                else:
-                    self.status[0] = "0"
-                self.counter = 0
+            time = time.time()
+            while time.time() - time < 0.495:
+                self.send(self.status) #long binary string
+                time.sleep(0.05)
+            #change the sleeps
 
     def scenario(self, message):
+        print("waiting for run signal from plc..")
         while message is None and self.last_plc_heartbeat[16] != "1":
             message = self.receive()
-        print("plc is alive, grabbing towel. This will take 10 seconds..")
+        print("plc is alive, robot is grabbing the towel. This will take 10 seconds..")
         begin = time.time()
         while(time.time()- begin < 10) and self.last_plc_heartbeat[17] == "1":
             self.status = self.status[0] + "0100000000000000100000000000000"
