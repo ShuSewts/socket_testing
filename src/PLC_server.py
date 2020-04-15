@@ -24,7 +24,7 @@ class PLCServer:
         print("socket binded to %s" %(port))
 
         # put the socket into listening mode
-        self.s.listen(5)
+        self.s.listen(1)
         print("socket is listening")
 
         # a forever loop until we interrupt it or
@@ -82,7 +82,7 @@ class PLCServer:
             #max time we wait for a message is 1 second
             while message is None and (time.time() - begin < 1.0):
                 try:
-                    message = self.s.recv(4)
+                    message = self.c.recv(4)
                 except socket.error as exc:
                     message = None #force s.recv() if we get a socket error
             try:
@@ -90,10 +90,8 @@ class PLCServer:
             except:
                 remainder = "0" # binascii doesnt react very well if message is empty
                 message = "0"
-            #print("BYTE ARRAY:" + message)
-            #print("BINARY STRING:" + remainder)
-            self.last_plc_heartbeat = remainder
-            return (len(message) == 4, remainder)
+            print("BYTE ARRAY:" + message)
+            print("BINARY STRING:" + remainder)
 
     def thread_links(self):
         print("This is a simulation (in messages) of a standard scenario.")
