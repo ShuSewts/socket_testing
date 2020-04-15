@@ -9,19 +9,18 @@ import binascii
 ##ways to make this shit faster
 ##send longer MESSAGES
 ##decrease the amount of overhead, if possible
-class FakeClient:
-    def __init__(self, port):
-        #rospy.init_node("fake_client", anonymous=True)
+class RobotClient:
+    def __init__(self, ip, port):
         # Create a socket object
         self.s = socket.socket()
 
         # Define the port on which you want to connect
-        self.port = port
+        self.port = property
+        self.ip = ip
 
         # connect to the server on local computer
-        self.s.connect(('127.0.0.1', self.port))
+        self.s.connect((self.ip, self.port))
         self.s.setblocking(0)
-        self.buffer = 16
         self.kill = False
         self.status = "10100000000000000100000000000000"
         self.last_plc_heartbeat = "11010110000000001100000000000000"
@@ -43,8 +42,8 @@ class FakeClient:
 
     #takes a binary message and sends a hex byte array
     def send(self, data): #give a binary message
-        data = self.process_binary(data)
-        b = bytearray.fromhex(data[2:])
+        data = self.process_binary(data) #bin to hex
+        b = bytearray.fromhex(data[2:]) #hex to hex byte array
         try:
             self.s.send(b)
         except socket.error as exc:
@@ -54,20 +53,23 @@ class FakeClient:
     def receive(self):
         message = None
         begin = time.time()
+        #max time we wait for a message is 1 second
         while message is None and (time.time() - begin < 1.0):
             try:
                 message = self.s.recv(4)
             except socket.error as exc:
-                message = None
+                message = None #force s.recv() if we get a socket error
         try:
             remainder = self.process_hex(binascii.hexlify(message)).zfill(32)
         except:
-            remainder = "0"
+            remainder = "0" # binascii doesnt react very well if message is empty
             message = "0"
-        #print(remainder)
+        print("BYTE ARRAY:" + message)
+        print("BINARY STRING:" + remainder)
         self.last_plc_heartbeat = remainder
         return (len(message) == 4, remainder)
 
+    #close socket connection
     def close(self):
         print("closing connection")
         self.s.close()
@@ -84,6 +86,7 @@ class FakeClient:
             else:
                 self.plc_heartbeat_counter = temp[1][0]
             if self.striker:
+                print("the heartbeat hasnt changed fora whole second")
                 self.kill = True
 
     #sends status to plc, changes heartbeat of gaming machine every half second
@@ -111,7 +114,6 @@ class FakeClient:
         self.status = self.status[0] + "0100000000000001000000000000000"
         while self.last_plc_heartbeat[18] != "1" and not self.kill:
             pass
-            #print(self.last_plc_heartbeat[18])
         print("Step 4: tcp will now move out of the target position. This will take a second...")
         begin = time.time()
         while time.time() - begin < 1 and not self.kill:
@@ -119,9 +121,6 @@ class FakeClient:
         self.status = self.status[0] + "0100000000000000000000000000000"
         print("Step 5: axis handles the towel")
         time.sleep(5)
-        #begin = time.time()
-        #while not self.kill and (time.time() - begin < 10):
-        #    pass
         self.kill = True
         self.close()
 
@@ -143,10 +142,5 @@ class FakeClient:
         Thread3.join()
 
 if __name__ == "__main__":
-    F = FakeClient(12345)
-    #F.send_status()
-    #F.get_plc_status()
+    F = RobotClient('127.0.0.1', 12345)
     F.thread_links()
-    #print(F.receive())
-    #print(F.receive())
-    #F.close()
