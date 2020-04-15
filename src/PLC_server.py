@@ -31,19 +31,33 @@ class PLCServer:
         self.c = None
         self.kill = False
 
-    #hex to binary
     def process_hex(self, message):
+        """
+        Inputs:   String   A hex number as a String
+        Outputs:  String   A binary number with 8 bits as a String
+        """
         return bin(int(message, 16))[2:].zfill(8)
 
-    #binary to hex
     def process_binary(self, message):
+        """
+        Inputs:   String   A binary number as a String
+        Outputs:  String   A hex number as a String
+        """
         return hex(int(message, 2))
 
     #int to binary
     def process_int(self, message):
+        """
+        Inputs:   int      An integer
+        Outputs:  String   A binary number with 8 bits as a String
+        """
         return "{0:b}".format(37).zfill(8)
 
     def receive(self):
+        """
+        Waits for a connection then continuously receives 4 bytes at a time
+        until the socket disconnects
+        """
         while self.addr == None:
            self.c, self.addr = self.s.accept()
         print('Got connection from', self.addr)
@@ -63,9 +77,13 @@ class PLCServer:
                     message = "0"
                     self.kill = True
                 #print("BYTE ARRAY:" + message)
-                #print("BINARY STRING:" + remainder)
+                print("BINARY STRING:" + remainder)
 
     def scenario_send(self):
+        """
+        Waits for a connection
+        continuously sends hardcoded messages to the Robot
+        """
         while self.c is None and self.addr is None:
             pass
         conf = hex(int(self.message, 2))
@@ -104,6 +122,10 @@ class PLCServer:
                self.message = "1" + self.message[1:]
 
     def thread_links(self):
+        """
+        receive()
+        scenario_send()
+        """
         print("This is a simulation (in messages) of a standard scenario.")
         print("begin by waiting for a plc signal..")
         Thread1 = threading.Thread(target=self.receive, kwargs={})

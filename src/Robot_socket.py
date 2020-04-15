@@ -30,7 +30,7 @@ class RobotClient:
         self.kill = False
         self.status = "10100000000000000100000000000000"
         self.last_plc_heartbeat = "11010110000000001100000000000000"
-        self.plc_heartbeat_counter = self.last_plc_heartbeat[0] #made 2 as i dont know if theyll be close enough in time
+        self.plc_heartbeat_counter = self.last_plc_heartbeat[0]
         self.striker = False
         self.ready = False
 
@@ -85,7 +85,7 @@ class RobotClient:
             remainder = "0" # binascii doesnt react very well if message is empty
             message = "0"
         #print("BYTE ARRAY:" + message)
-        print("BINARY STRING:" + remainder)
+        #print("BINARY STRING:" + remainder)
         self.last_plc_heartbeat = remainder
         return (len(message) == 4, remainder)
 
@@ -124,7 +124,7 @@ class RobotClient:
         while not self.kill:
             time1 = time.time()
             while time.time() - time1 < 0.44:
-                self.send(self.status) #long binary string
+                self.send(self.status) 
                 #print(self.status)
                 time.sleep(0.05)
             if self.status[0] == "0":
