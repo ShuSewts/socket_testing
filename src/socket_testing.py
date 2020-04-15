@@ -3,12 +3,12 @@
 import socket#
 import sys
 #sys.path.append('/opt/ros/kinetic/lib/python2.7/dist-packages')
-import rospy
+#import rospy
 import time
 import binascii
 #sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 
-rospy.init_node("fake_plc", anonymous=True)
+#rospy.init_node("fake_plc", anonymous=True)
 
 # next create a socket object
 s = socket.socket()
@@ -58,7 +58,7 @@ while time.time() - start < 12:
        conf = hex(int(message, 2))
        last = bytearray.fromhex(conf[2:])
        c.send(last)
-       #print(binascii.hexlify(last))
+       print(binascii.hexlify(last))
        time.sleep(0.05)
    if message[0] == "1":
        message = "0" + message[1:]
@@ -73,6 +73,7 @@ while True:
        conf = hex(int(message, 2))
        last = bytearray.fromhex(conf[2:])
        c.send(last)
+       print(binascii.hexlify(last))
        time.sleep(0.05)
     if message[0] == "1":
        message = "0" + message[1:]

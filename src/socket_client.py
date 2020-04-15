@@ -92,6 +92,7 @@ class FakeClient:
             time1 = time.time()
             while time.time() - time1 < 0.44:
                 self.send(self.status) #long binary string
+                #print(self.status)
                 time.sleep(0.05)
             if self.status[0] == "0":
                 self.status = "1" + self.status[1:]
