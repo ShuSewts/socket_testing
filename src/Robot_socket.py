@@ -21,7 +21,6 @@ class RobotClient:
         # connect to the server on local computer
         self.s.connect((self.ip, self.port))
         print("socket connected to %s" %(port))
-        print(self.s)
         self.s.setblocking(0)
         self.kill = False
         self.status = "10100000000000000100000000000000"

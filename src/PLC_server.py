@@ -29,6 +29,7 @@ class PLCServer:
         self.message = "11010110000000001100000000000000"
         self.addr = None
         self.c = None
+        self.kill = False
 
     #hex to binary
     def process_hex(self, message):
@@ -45,10 +46,9 @@ class PLCServer:
     def receive(self):
         while self.addr == None:
            self.c, self.addr = self.s.accept()
-           print(self.c)
         print('Got connection from', self.addr)
         with self.c:
-            while True:
+            while not self.kill:
                 message = None
                 begin = time.time()
                 while message is None and time.time() - begin < 1.0:
@@ -61,6 +61,7 @@ class PLCServer:
                 except:
                     remainder = "0" # binascii doesnt react very well if message is empty
                     message = "0"
+                    self.kill = True
                 #print("BYTE ARRAY:" + message)
                 #print("BINARY STRING:" + remainder)
 
@@ -88,7 +89,7 @@ class PLCServer:
                self.message = "1" + self.message[1:]
 
         self.message = self.message[0:18] + "1" + self.message[19:]
-        while True:
+        while not self.kill:
             begin = time.time()
             while time.time() - begin < 0.44:
                conf = hex(int(self.message, 2))
