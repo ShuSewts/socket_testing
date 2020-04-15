@@ -3,29 +3,26 @@ import sys
 import time
 import binascii
 import threading
-
+from datetime import datetime
 
 class PLCServer:
+    """
+    Creates a Fake PLC Server the Robot Client can connect to
+    """
     def __init__(self, ip, port):
+        """
+        Creates the socket server for the PLC
+        """
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print("Socket successfully created")
+        print(str(datetime.now()) + " Socket successfully created")
 
-        # reserve a port on your computer in our
-        # case it is 12345 but it can be anything
         self.port = port
         self.ip = ip
-
-        # Next bind to the port
-        # we have not typed any ip in the ip field
-        # instead we have inputted an empty string
-        # this makes the server listen to requests
-        # coming from other computers on the network
         self.s.bind((self.ip, self.port))
         print("socket binded to %s" %(port))
 
-        # put the socket into listening mode
         self.s.listen(1)
-        print("socket is listening")
+        print(str(datetime.now()) + " socket is listening")
         self.message = "11010110000000001100000000000000"
         self.addr = None
         self.c = None
@@ -45,7 +42,6 @@ class PLCServer:
         """
         return hex(int(message, 2))
 
-    #int to binary
     def process_int(self, message):
         """
         Inputs:   int      An integer
@@ -76,8 +72,8 @@ class PLCServer:
                     remainder = "0" # binascii doesnt react very well if message is empty
                     message = "0"
                     self.kill = True
-                #print("BYTE ARRAY:" + message)
-                print("BINARY STRING:" + remainder)
+                #print(str(datetime.now()) + " BYTE ARRAY:" + message)
+                #print(str(datetime.now()) + " BINARY STRING:" + remainder)
 
     def scenario_send(self):
         """
@@ -88,38 +84,55 @@ class PLCServer:
             pass
         conf = hex(int(self.message, 2))
         last = bytearray.fromhex(conf[2:])
-        self.c.send(last)
-        #print("BYTE ARRAY:" + last)
-        #print("BINARY STRING:" + conf)
+        try:
+            self.c.send(last)
+        except:
+            self.kill = True
+        #print(str(datetime.now()) + " BYTE ARRAY:" + last)
+        #print(str(datetime.now()) + " BINARY STRING:" + conf)
+        print(str(datetime.now()) + " plc is waiting for a towel")
         start = time.time()
-        while time.time() - start < 12:
+        while time.time() - start < 12 and not self.kill:
            begin = time.time()
            while time.time() - begin < 0.44:
                conf = hex(int(self.message, 2))
                last = bytearray.fromhex(conf[2:])
-               self.c.send(last)
-               #print("BYTE ARRAY:" + last)
-               #print("BINARY STRING:" + conf)
+               try:
+                   self.c.send(last)
+               except:
+                   self.kill = True
+               #print(str(datetime.now()) + " BYTE ARRAY:" + last)
+               #print(str(datetime.now()) + " BINARY STRING:" + conf)
                time.sleep(0.05)
            if self.message[0] == "1":
                self.message = "0" + self.message[1:]
            else:
                self.message = "1" + self.message[1:]
-
+        print(str(datetime.now()) + " plc is now holding the towel")
         self.message = self.message[0:18] + "1" + self.message[19:]
-        while not self.kill:
+        start = time.time()
+        while time.time() - start < 3 and not self.kill:
             begin = time.time()
             while time.time() - begin < 0.44:
                conf = hex(int(self.message, 2))
                last = bytearray.fromhex(conf[2:])
-               self.c.send(last)
-               #print("BYTE ARRAY:" + last)
-               #print("BINARY STRING:" + conf)
+               try:
+                   self.c.send(last)
+               except:
+                   self.kill = True
+               #print(str(datetime.now()) + " BYTE ARRAY:" + last)
+               #print(str(datetime.now()) + " BINARY STRING:" + conf)
                time.sleep(0.05)
             if self.message[0] == "1":
                self.message = "0" + self.message[1:]
             else:
                self.message = "1" + self.message[1:]
+        print(str(datetime.now()) + " We will simulate the heartbeat not changing now")
+        while not self.kill:
+            try:
+                self.c.send(last)
+            except:
+                self.kill = True
 
     def thread_links(self):
         """
@@ -127,8 +140,8 @@ class PLCServer:
         receive()
         scenario_send()
         """
-        print("This is a simulation (in messages) of a standard scenario.")
-        print("begin by waiting for a plc signal..")
+        print(str(datetime.now()) + " This is a simulation (in messages) of a standard scenario.")
+        print(str(datetime.now()) + " begin by waiting for a robot signal..")
         Thread1 = threading.Thread(target=self.receive, kwargs={})
         Thread2 = threading.Thread(target=self.scenario_send, kwargs={})
         Thread1.start()

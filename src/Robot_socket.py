@@ -1,14 +1,9 @@
-
-# Import socket module
 import socket
-#import rospy
 import threading
 import time
 import binascii
+from datetime import datetime
 
-##ways to make this shit faster
-##send longer MESSAGES
-##decrease the amount of overhead, if possible
 class RobotClient:
     """
     Creates a Fake Robot Client for connecting to the PLC Socket
@@ -84,8 +79,8 @@ class RobotClient:
         except:
             remainder = "0" # binascii doesnt react very well if message is empty
             message = "0"
-        #print("BYTE ARRAY:" + message)
-        #print("BINARY STRING:" + remainder)
+        #print(str(datetime.now()) + " BYTE ARRAY:" + message)
+        #print(str(datetime.now()) + " BINARY STRING:" + remainder)
         self.last_plc_heartbeat = remainder
         return (len(message) == 4, remainder)
 
@@ -93,7 +88,7 @@ class RobotClient:
         """
         Closes socket connection
         """
-        print("closing connection")
+        print(str(datetime.now()) + " closing connection")
         self.s.close()
 
     def get_plc_status(self):
@@ -107,12 +102,12 @@ class RobotClient:
             while time.time() - begin < 0.44:
                 temp = self.receive()
             if temp[1][0] == self.plc_heartbeat_counter:
-                print("the heartbeat hasnt changed in a half a second")
+                print(str(datetime.now()) + " the heartbeat hasnt changed in a half a second")
                 self.striker = True
             else:
                 self.plc_heartbeat_counter = temp[1][0]
             if self.striker:
-                print("the heartbeat hasnt changed fora whole second")
+                print(str(datetime.now()) + " the heartbeat hasnt changed fora whole second")
                 self.kill = True
 
     def send_status(self):
@@ -124,8 +119,8 @@ class RobotClient:
         while not self.kill:
             time1 = time.time()
             while time.time() - time1 < 0.44:
-                self.send(self.status) 
-                #print(self.status)
+                self.send(self.status)
+                #print(str(datetime.now()) + self.status)
                 time.sleep(0.05)
             if self.status[0] == "0":
                 self.status = "1" + self.status[1:]
@@ -136,23 +131,23 @@ class RobotClient:
         """
         Creates a Scenario in Simulation
         """
-        print("Step 1: waiting for run signal from plc..")
+        print(str(datetime.now()) + " Step 1: waiting for run signal from plc..")
         while message is None and self.last_plc_heartbeat[16] != "1" and not self.kill:
             message = self.receive()
-        print("Step 2: plc is alive, robot is grabbing the towel. This will take 10 seconds..")
+        print(str(datetime.now()) + " Step 2: plc is alive, robot is grabbing the towel. This will take 10 seconds..")
         begin = time.time()
         while(time.time()- begin < 10) and self.last_plc_heartbeat[17] == "1" and not self.kill:
             self.status = self.status[0] + "0100000000000000100000000000000"
-        print("Step 3: towel ready for plc")
+        print(str(datetime.now()) + " Step 3: towel ready for plc")
         self.status = self.status[0] + "0100000000000001000000000000000"
         while self.last_plc_heartbeat[18] != "1" and not self.kill:
             pass
-        print("Step 4: tcp will now move out of the target position. This will take a second...")
+        print(str(datetime.now()) + " Step 4: tcp will now move out of the target position. This will take a second...")
         begin = time.time()
         while time.time() - begin < 1 and not self.kill:
             pass
         self.status = self.status[0] + "0100000000000000000000000000000"
-        print("Step 5: axis handles the towel")
+        print(str(datetime.now()) + " Step 5: axis handles the towel")
         time.sleep(5)
         self.kill = True
         self.close()
@@ -161,7 +156,7 @@ class RobotClient:
         """
         Placeholder method
         """
-        print("we only have the heartbeat right now")
+        print(str(datetime.now()) + " we only have the heartbeat right now")
 
     def thread_links(self):
         """
@@ -171,8 +166,8 @@ class RobotClient:
         scenario()
         """
         time.sleep(1)
-        print("This is a simulation (in messages) of a standard scenario.")
-        print("begin by waiting for a plc signal..")
+        print(str(datetime.now()) + " This is a simulation (in messages) of a standard scenario.")
+        print(str(datetime.now()) + " begin by waiting for a plc signal..")
         Thread1 = threading.Thread(target=self.send_status, kwargs={})
         Thread2 = threading.Thread(target=self.get_plc_status, kwargs={})
         Thread3 = threading.Thread(target=self.scenario, kwargs={'message': None})
