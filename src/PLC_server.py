@@ -123,6 +123,7 @@ class PLCServer:
 
     def thread_links(self):
         """
+        Creates and runs a thread for the methods:
         receive()
         scenario_send()
         """
