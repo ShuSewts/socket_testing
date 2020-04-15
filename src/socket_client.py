@@ -15,7 +15,7 @@ class RobotClient:
         self.s = socket.socket()
 
         # Define the port on which you want to connect
-        self.port = property
+        self.port = port
         self.ip = ip
 
         # connect to the server on local computer
@@ -64,7 +64,7 @@ class RobotClient:
         except:
             remainder = "0" # binascii doesnt react very well if message is empty
             message = "0"
-        print("BYTE ARRAY:" + message)
+        #print("BYTE ARRAY:" + message)
         print("BINARY STRING:" + remainder)
         self.last_plc_heartbeat = remainder
         return (len(message) == 4, remainder)
