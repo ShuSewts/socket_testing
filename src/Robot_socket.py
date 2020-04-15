@@ -10,7 +10,13 @@ import binascii
 ##send longer MESSAGES
 ##decrease the amount of overhead, if possible
 class RobotClient:
+    """
+    Creates a Fake Robot Client for connecting to the PLC Socket
+    """
     def __init__(self, ip, port):
+        """
+        Creates the socket object for the Robot
+        """
         # Create a socket object
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -18,7 +24,6 @@ class RobotClient:
         self.port = port
         self.ip = ip
 
-        # connect to the server on local computer
         self.s.connect((self.ip, self.port))
         print("socket connected to %s" %(port))
         self.s.setblocking(0)
@@ -29,20 +34,32 @@ class RobotClient:
         self.striker = False
         self.ready = False
 
-    #hex to binary
     def process_hex(self, message):
+        """
+        Inputs:   String   A hex number as a String
+        Outputs:  String   A binary number with 8 bits as a String
+        """
         return bin(int(message, 16))[2:].zfill(8)
 
-    #binary to hex
     def process_binary(self, message):
+        """
+        Inputs:   String   A binary number as a String
+        Outputs:  String   A hex number as a String
+        """
         return hex(int(message, 2))
 
-    #int to binary
     def process_int(self, message):
+        """
+        Inputs:   int      An integer
+        Outputs:  String   A binary number with 8 bits as a String
+        """
         return "{0:b}".format(37).zfill(8)
 
-    #takes a binary message and sends a hex byte array
-    def send(self, data): #give a binary message
+    def send(self, data):
+        """
+        Inputs:   String   A binary number with 8 bits as a String
+        Turns a binary number into a byte array and sends the byte array through the socket connection
+        """
         data = self.process_binary(data) #bin to hex
         b = bytearray.fromhex(data[2:]) #hex to hex byte array
         try:
@@ -50,8 +67,10 @@ class RobotClient:
         except socket.error as exc:
             pass
 
-    #receives a hex byte array converts to a binary string
     def receive(self):
+        """
+        Receives a byte array via the socket connection and converts to binary string
+        """
         message = None
         begin = time.time()
         #max time we wait for a message is 1 second
@@ -70,13 +89,19 @@ class RobotClient:
         self.last_plc_heartbeat = remainder
         return (len(message) == 4, remainder)
 
-    #close socket connection
     def close(self):
+        """
+        Closes socket connection
+        """
         print("closing connection")
         self.s.close()
 
-    #gets plc status, kills everything if the heartbeat doesnt change
     def get_plc_status(self):
+        """
+        Requests the status of the PLC every 50ms
+        Checks if the heartbeat of the PLC is changing
+        If the heartbeat does not change for one second, this method is killed
+        """
         while not self.kill:
             begin = time.time()
             while time.time() - begin < 0.44:
@@ -90,8 +115,12 @@ class RobotClient:
                 print("the heartbeat hasnt changed fora whole second")
                 self.kill = True
 
-    #sends status to plc, changes heartbeat of gaming machine every half second
     def send_status(self):
+        """
+        Sends status of Robot every 50 ms
+        Changes the heartbeat every 500ms
+        If the heartbeat of the PLC does not change, this method is killed
+        """
         while not self.kill:
             time1 = time.time()
             while time.time() - time1 < 0.44:
@@ -104,6 +133,9 @@ class RobotClient:
                 self.status = "0" + self.status[1:]
 
     def scenario(self, message):
+        """
+        Creates a Scenario in Simulation
+        """
         print("Step 1: waiting for run signal from plc..")
         while message is None and self.last_plc_heartbeat[16] != "1" and not self.kill:
             message = self.receive()
@@ -126,9 +158,18 @@ class RobotClient:
         self.close()
 
     def killable_scenarios(self):
+        """
+        Placeholder method
+        """
         print("we only have the heartbeat right now")
 
     def thread_links(self):
+        """
+        Creates and runs a thread for the methods:
+        send_status()
+        get_plc_status()
+        scenario()
+        """
         time.sleep(1)
         print("This is a simulation (in messages) of a standard scenario.")
         print("begin by waiting for a plc signal..")
