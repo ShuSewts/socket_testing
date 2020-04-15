@@ -23,8 +23,8 @@ class RobotClient:
         print("socket connected to %s" %(port))
         self.s.setblocking(0)
         self.kill = False
-        self.status = "10100000000000000100000000000000"
-        self.last_plc_heartbeat = "11010110000000001100000000000000"
+        self.status = ['1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
+        self.last_plc_heartbeat = ['1', '1', '0', '1', '0', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
         self.plc_heartbeat_counter = self.last_plc_heartbeat[0]
         self.striker = False
         self.ready = False
@@ -52,9 +52,10 @@ class RobotClient:
 
     def send(self, data):
         """
-        Inputs:   String   A binary number with 8 bits as a String
+        Inputs:   list   A list of characters
         Turns a binary number into a byte array and sends the byte array through the socket connection
         """
+        data = ''.join(data)
         data = self.process_binary(data) #bin to hex
         b = bytearray.fromhex(data[2:]) #hex to hex byte array
         try:
@@ -81,8 +82,8 @@ class RobotClient:
             message = "0"
         #print(str(datetime.now()) + " BYTE ARRAY:" + message)
         #print(str(datetime.now()) + " BINARY STRING:" + remainder)
-        self.last_plc_heartbeat = remainder
-        return (len(message) == 4, remainder)
+        self.last_plc_heartbeat = [char for char in remainder]
+        return (len(message) == 4, self.last_plc_heartbeat)
 
     def close(self):
         """
@@ -99,15 +100,16 @@ class RobotClient:
         """
         while not self.kill:
             begin = time.time()
-            while time.time() - begin < 0.44:
+            while time.time() - begin < 0.43:
                 temp = self.receive()
+                #print(temp)
             if temp[1][0] == self.plc_heartbeat_counter:
                 print(str(datetime.now()) + " the heartbeat hasnt changed in a half a second")
                 self.striker = True
             else:
                 self.plc_heartbeat_counter = temp[1][0]
             if self.striker:
-                print(str(datetime.now()) + " the heartbeat hasnt changed fora whole second")
+                print(str(datetime.now()) + " the heartbeat hasnt changed for a whole second")
                 self.kill = True
 
     def send_status(self):
@@ -123,9 +125,9 @@ class RobotClient:
                 #print(str(datetime.now()) + self.status)
                 time.sleep(0.05)
             if self.status[0] == "0":
-                self.status = "1" + self.status[1:]
+                self.status[0] = "1"
             else:
-                self.status = "0" + self.status[1:]
+                self.status[0] = "0"
 
     def scenario(self, message):
         """
@@ -134,21 +136,23 @@ class RobotClient:
         print(str(datetime.now()) + " Step 1: waiting for run signal from plc..")
         while message is None and self.last_plc_heartbeat[16] != "1" and not self.kill:
             message = self.receive()
-        print(str(datetime.now()) + " Step 2: plc is alive, robot is grabbing the towel. This will take 10 seconds..")
+        print(str(datetime.now()) + " Step 2: plc is alive, robot is grabbing the towel. This will take 3 seconds..")
         begin = time.time()
-        while(time.time()- begin < 10) and self.last_plc_heartbeat[17] == "1" and not self.kill:
-            self.status = self.status[0] + "0100000000000000100000000000000"
+        while(time.time()- begin < 3) and self.last_plc_heartbeat[17] == "1" and not self.kill:
+            self.status = [self.status[0]] + ['0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
         print(str(datetime.now()) + " Step 3: towel ready for plc")
-        self.status = self.status[0] + "0100000000000001000000000000000"
+        self.status = [self.status[0]] + ['0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
         while self.last_plc_heartbeat[18] != "1" and not self.kill:
             pass
         print(str(datetime.now()) + " Step 4: tcp will now move out of the target position. This will take a second...")
         begin = time.time()
         while time.time() - begin < 1 and not self.kill:
             pass
-        self.status = self.status[0] + "0100000000000000000000000000000"
+        self.status = [self.status[0]] + ['0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
         print(str(datetime.now()) + " Step 5: axis handles the towel")
-        time.sleep(5)
+        begin = time.time()
+        while not self.kill and begin - time.time()  < 6:
+            pass
         self.kill = True
         self.close()
 
