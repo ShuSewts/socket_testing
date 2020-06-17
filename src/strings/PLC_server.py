@@ -23,8 +23,7 @@ class PLCServer:
 
         self.s.listen(1)
         print(str(datetime.now()) + " socket is listening")
-        self.message = ['1', '1', '0', '1', '0', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
-        self.robot_status = []
+        self.message = "11010110000000001100000000000000"
         self.addr = None
         self.c = None
         self.kill = False
@@ -69,7 +68,6 @@ class PLCServer:
                         message = None
                 try:
                     remainder = self.process_hex(binascii.hexlify(message)).zfill(32)
-                    self.robot_status = [char for char in remainder]
                 except:
                     remainder = "0" # binascii doesnt react very well if message is empty
                     message = "0"
@@ -84,7 +82,7 @@ class PLCServer:
         """
         while self.c is None and self.addr is None:
             pass
-        conf = hex(int(''.join(self.message), 2))
+        conf = hex(int(self.message, 2))
         last = bytearray.fromhex(conf[2:])
         try:
             self.c.send(last)
@@ -97,26 +95,26 @@ class PLCServer:
         while time.time() - start < 5 and not self.kill:
            begin = time.time()
            while time.time() - begin < 0.44:
-               conf = hex(int(''.join(self.message), 2))
+               conf = hex(int(self.message, 2))
                last = bytearray.fromhex(conf[2:])
                try:
                    self.c.send(last)
                except:
                    self.kill = True
-               print(str(datetime.now()) + " BYTE ARRAY:" + str(last))
+               #print(str(datetime.now()) + " BYTE ARRAY:" + last)
                #print(str(datetime.now()) + " BINARY STRING:" + conf)
                time.sleep(0.05)
            if self.message[0] == "1":
-               self.message[0] = "0"
+               self.message = "0" + self.message[1:]
            else:
-               self.message[0] = "1"
+               self.message = "1" + self.message[1:]
         print(str(datetime.now()) + " plc is now holding the towel")
-        self.message[18] = "1"
+        self.message = self.message[0:18] + "1" + self.message[19:]
         start = time.time()
         while time.time() - start < 4 and not self.kill:
             begin = time.time()
             while time.time() - begin < 0.44:
-               conf = hex(int(''.join(self.message), 2))
+               conf = hex(int(self.message, 2))
                last = bytearray.fromhex(conf[2:])
                try:
                    self.c.send(last)
@@ -126,9 +124,9 @@ class PLCServer:
                #print(str(datetime.now()) + " BINARY STRING:" + conf)
                time.sleep(0.05)
             if self.message[0] == "1":
-               self.message[0] = "0"
+               self.message = "0" + self.message[1:]
             else:
-               self.message[0] = "1"
+               self.message = "1" + self.message[1:]
         print(str(datetime.now()) + " We will simulate the heartbeat not changing now")
         while not self.kill:
             try:
